@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 
+const queryString = window.location.search
+const urlParams = new URLSearchParams(queryString)
+
 const params = {
-  node: '48955',
-  is_async: false,
+  node: urlParams.get('on_success_node'),
   get_params: {
-    base_url: 'https://designer.fstrk.io/',
-    bot_key: 'c7736d90-a435-4f22-920a-1f5d9ce77fb3',
-    cart_variable: 'cart-8f23fa09-c277-424a-9604-f5dd1c859bea',
-    chat_uuid: 'e97e9588-ffed-4af6-9095-23a26ec8555c',
-    ecommerce: '8f23fa09-c277-424a-9604-f5dd1c859bea',
-    ecommerce_url: 'https://fasttrack-ecom-fashion.flex.fstrk.io',
-    is_async: false,
-    on_clear_node: null,
-    on_close_url:
-      'https://refer.id/?bot=demo_webview_bot&platform=telegram&verbose_name=Бот для собеседований&is_close_url=1',
-    on_success_node: '48955',
-    primary_color: '0d92d2',
-    widget_origin: null,
+    base_url: urlParams.get('base_url'),
+    bot_key: urlParams.get('bot_key'),
+    cart_variable: `cart-${urlParams.get('ecommerce')}`,
+    chat_uuid: urlParams.get('chat_uuid'),
+    ecommerce: urlParams.get('ecommerce'),
+    ecommerce_url: urlParams.get('ecommerce_url'),
+    on_close_url: urlParams.get('on_close_url'),
+    on_success_node: urlParams.get('on_success_node'),
+    primary_color: urlParams.get('primary_color'),
   },
 }
 
@@ -56,8 +54,13 @@ function App() {
   }
 
   const push = () => {
-    axios.post(api.push, params)
-    window.location.href = params.get_params.on_close_url
+    axios.post(api.push, params).then(() => {
+      window.location.href = params.get_params.on_close_url
+    })
+  }
+
+  if (!queryString) {
+    return 'add get params in url'
   }
 
   return (
