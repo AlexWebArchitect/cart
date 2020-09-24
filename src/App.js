@@ -4,19 +4,18 @@ import axios from 'axios'
 const queryString = window.location.search
 const urlParams = new URLSearchParams(queryString)
 
+const paramsToObject = (entries) => {
+  let result = {}
+  for (let entry of entries) {
+    const [key, value] = entry
+    result[key] = value
+  }
+  return result
+}
+
 const params = {
   node: urlParams.get('on_success_node'),
-  get_params: {
-    base_url: urlParams.get('base_url'),
-    bot_key: urlParams.get('bot_key'),
-    cart_variable: `cart-${urlParams.get('ecommerce')}`,
-    chat_uuid: urlParams.get('chat_uuid'),
-    ecommerce: urlParams.get('ecommerce'),
-    ecommerce_url: urlParams.get('ecommerce_url'),
-    on_close_url: urlParams.get('on_close_url'),
-    on_success_node: urlParams.get('on_success_node'),
-    primary_color: urlParams.get('primary_color'),
-  },
+  get_params: paramsToObject(urlParams.entries()),
 }
 
 const api = {
@@ -37,7 +36,7 @@ function App() {
 
   useEffect(() => {
     axios.get(api.variables).then((res) => {
-      setProducts(res.data[params.get_params.cart_variable].products)
+      setProducts(res.data[`cart-${params.get_params.ecommerce}`].products)
     })
   }, [])
 
@@ -48,7 +47,7 @@ function App() {
         )
       : products.filter((product, index) => index !== id)
     axios.post(api.variables, {
-      [params.get_params.cart_variable]: { products: updatedProducts },
+      [`cart-${params.get_params.ecommerce}`]: { products: updatedProducts },
     })
     setProducts(updatedProducts)
   }
